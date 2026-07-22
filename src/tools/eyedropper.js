@@ -16,4 +16,20 @@ export class EyedropperTool extends BaseTool {
       this.paletteManager.setColor1(hex);
     }
   }
+
+  onMouseMove(e, pos) {
+    const oCtx = this.canvasManager.oCtx;
+    this.canvasManager.clearOverlay();
+    oCtx.save();
+    oCtx.strokeStyle = '#000000';
+    oCtx.lineWidth = 1;
+    oCtx.beginPath();
+    oCtx.arc(pos.x, pos.y, 4, 0, Math.PI * 2);
+    oCtx.stroke();
+    oCtx.strokeStyle = '#ffffff';
+    oCtx.beginPath();
+    oCtx.arc(pos.x, pos.y, 5, 0, Math.PI * 2);
+    oCtx.stroke();
+    oCtx.restore();
+  }
 }

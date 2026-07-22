@@ -12,6 +12,22 @@ export class FloodFillTool extends BaseTool {
     this.floodFill(pos.x, pos.y, fillColor);
   }
 
+  onMouseMove(e, pos) {
+    const oCtx = this.canvasManager.oCtx;
+    this.canvasManager.clearOverlay();
+    oCtx.save();
+    oCtx.strokeStyle = '#000000';
+    oCtx.lineWidth = 1;
+    oCtx.beginPath();
+    oCtx.arc(pos.x, pos.y, 5, 0, Math.PI * 2);
+    oCtx.stroke();
+    oCtx.strokeStyle = '#ffffff';
+    oCtx.beginPath();
+    oCtx.arc(pos.x, pos.y, 6, 0, Math.PI * 2);
+    oCtx.stroke();
+    oCtx.restore();
+  }
+
   hexToRgba(hex) {
     let c = hex.replace('#', '');
     if (c.length === 3) c = c.split('').map(x => x + x).join('');

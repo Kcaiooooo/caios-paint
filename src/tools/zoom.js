@@ -15,6 +15,22 @@ export class ZoomTool extends BaseTool {
     this.updateZoomUI(currentZoom);
   }
 
+  onMouseMove(e, pos) {
+    const oCtx = this.canvasManager.oCtx;
+    this.canvasManager.clearOverlay();
+    oCtx.save();
+    oCtx.strokeStyle = '#000000';
+    oCtx.lineWidth = 1;
+    oCtx.beginPath();
+    oCtx.arc(pos.x, pos.y, 8, 0, Math.PI * 2);
+    oCtx.stroke();
+    oCtx.strokeStyle = '#ffffff';
+    oCtx.beginPath();
+    oCtx.arc(pos.x, pos.y, 9, 0, Math.PI * 2);
+    oCtx.stroke();
+    oCtx.restore();
+  }
+
   updateZoomUI(zoom) {
     const pct = Math.round(zoom * 100);
     const range = document.getElementById('zoomRange');
