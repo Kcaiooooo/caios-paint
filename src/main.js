@@ -173,13 +173,27 @@ class PaintApp {
       });
     });
 
-    // 8. Size / Stroke Slider & Presets
+    // 8. Size / Stroke Slider, Input & Presets
     const strokeRange = document.getElementById('strokeSizeRange');
-    const strokeVal = document.getElementById('strokeSizeVal');
+    const strokeNum = document.getElementById('strokeSizeNum');
 
     if (strokeRange) {
       strokeRange.addEventListener('input', (e) => {
         this.setStrokeSize(parseInt(e.target.value));
+      });
+      strokeRange.addEventListener('change', (e) => {
+        this.setStrokeSize(parseInt(e.target.value));
+      });
+    }
+
+    if (strokeNum) {
+      strokeNum.addEventListener('input', (e) => {
+        const val = parseInt(e.target.value);
+        if (!isNaN(val)) this.setStrokeSize(val);
+      });
+      strokeNum.addEventListener('change', (e) => {
+        const val = parseInt(e.target.value);
+        if (!isNaN(val)) this.setStrokeSize(val);
       });
     }
 
@@ -296,25 +310,28 @@ class PaintApp {
     this.currentTool = this.tools[toolName];
     if (this.currentTool) {
       this.currentTool.setStrokeWidth(this.currentSize);
+      this.updateCursorRing();
     }
   }
 
   setStrokeSize(size) {
-    size = Math.max(1, Math.min(50, size));
+    size = Math.max(1, Math.min(500, parseInt(size) || 1));
     this.currentSize = size;
 
     const strokeRange = document.getElementById('strokeSizeRange');
+    const strokeNum = document.getElementById('strokeSizeNum');
     const strokeVal = document.getElementById('strokeSizeVal');
     const strokeDot = document.getElementById('strokeDot');
 
-    if (strokeRange) strokeRange.value = size;
+    if (strokeRange) strokeRange.value = Math.min(200, size);
+    if (strokeNum) strokeNum.value = size;
     if (strokeVal) strokeVal.textContent = `${size}px`;
 
     if (strokeDot) {
-      const dotSize = Math.max(2, Math.min(30, size));
+      const dotSize = Math.max(2, Math.min(32, size));
       strokeDot.style.width = `${dotSize}px`;
       strokeDot.style.height = `${dotSize}px`;
-      strokeDot.style.backgroundColor = this.paletteMgr.color1;
+      strokeDot.style.backgroundColor = this.paletteMgr ? this.paletteMgr.color1 : '#000000';
     }
 
     document.querySelectorAll('.preset-chip').forEach(chip => {
@@ -323,6 +340,18 @@ class PaintApp {
     });
 
     Object.values(this.tools).forEach(tool => tool.setStrokeWidth(size));
+
+    // RE-RENDER CURSOR RING IMMEDIATELY IN REAL TIME!
+    this.updateCursorRing();
+  }
+
+  updateCursorRing() {
+    if (!this.currentTool || !this.lastPointerPos || !this.isMouseOverCanvas) return;
+    if (typeof this.currentTool.renderCursor === 'function') {
+      this.currentTool.renderCursor(this.lastPointerPos);
+    } else if (typeof this.currentTool.onMouseMove === 'function') {
+      this.currentTool.onMouseMove({ synthetic: true }, this.lastPointerPos);
+    }
   }
 
   /* Canvas Interaction Dispatcher */
@@ -331,8 +360,22 @@ class PaintApp {
 
     overlay.addEventListener('contextmenu', (e) => e.preventDefault());
 
+    overlay.addEventListener('mouseenter', (e) => {
+      this.isMouseOverCanvas = true;
+      this.lastPointerPos = this.canvasMgr.getPointerPos(e);
+      this.updateCursorRing();
+    });
+
+    overlay.addEventListener('mouseleave', () => {
+      this.isMouseOverCanvas = false;
+      this.lastPointerPos = null;
+      this.canvasMgr.clearOverlay();
+    });
+
     overlay.addEventListener('mousedown', (e) => {
       const pos = this.canvasMgr.getPointerPos(e);
+      this.lastPointerPos = pos;
+      this.isMouseOverCanvas = true;
       if (this.currentTool) {
         this.currentTool.onMouseDown(e, pos);
       }
@@ -340,6 +383,8 @@ class PaintApp {
 
     overlay.addEventListener('mousemove', (e) => {
       const pos = this.canvasMgr.getPointerPos(e);
+      this.lastPointerPos = pos;
+      this.isMouseOverCanvas = true;
       document.getElementById('statusPos').querySelector('span').textContent = `${pos.x}, ${pos.y}px`;
 
       if (this.currentTool) {
@@ -349,17 +394,15 @@ class PaintApp {
 
     overlay.addEventListener('mouseup', (e) => {
       const pos = this.canvasMgr.getPointerPos(e);
+      this.lastPointerPos = pos;
       if (this.currentTool) {
         this.currentTool.onMouseUp(e, pos);
       }
     });
 
-    overlay.addEventListener('mouseleave', () => {
-      this.canvasMgr.clearOverlay();
-    });
-
     overlay.addEventListener('dblclick', (e) => {
       const pos = this.canvasMgr.getPointerPos(e);
+      this.lastPointerPos = pos;
       if (this.currentTool && this.currentTool.onDblClick) {
         this.currentTool.onDblClick(e, pos);
       }

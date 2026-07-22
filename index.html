@@ -238,20 +238,23 @@
 
               <!-- Slider & Presets Group -->
               <div class="stroke-slider-group">
-                <div class="stroke-slider-header">
-                  <span>Espessura</span>
-                  <span id="strokeSizeVal" style="font-weight:600; color:var(--text-main);">3px</span>
+                <div class="stroke-slider-header" style="display:flex; justify-content:space-between; align-items:center; gap:6px;">
+                  <span>Espessura:</span>
+                  <div style="display:flex; align-items:center; gap:2px;">
+                    <input type="number" id="strokeSizeNum" class="form-input" min="1" max="500" value="3" style="width:52px; height:20px; padding:1px 4px; font-size:11px; font-weight:700; font-family:monospace; text-align:right;">
+                    <span style="font-size:11px; font-weight:600; color:var(--text-muted);">px</span>
+                  </div>
                 </div>
-                <input type="range" class="stroke-slider" id="strokeSizeRange" min="1" max="50" value="3" title="Ajuste o tamanho (1px a 50px)">
+                <input type="range" class="stroke-slider" id="strokeSizeRange" min="1" max="200" value="3" title="Ajuste o tamanho da espessura (1px a 500px)">
                 
                 <div class="stroke-presets" id="strokePresets">
                   <button class="preset-chip" data-size="1">1px</button>
                   <button class="preset-chip active" data-size="3">3px</button>
                   <button class="preset-chip" data-size="5">5px</button>
-                  <button class="preset-chip" data-size="8">8px</button>
                   <button class="preset-chip" data-size="12">12px</button>
-                  <button class="preset-chip" data-size="20">20px</button>
                   <button class="preset-chip" data-size="30">30px</button>
+                  <button class="preset-chip" data-size="60">60px</button>
+                  <button class="preset-chip" data-size="100">100px</button>
                 </div>
               </div>
             </div>

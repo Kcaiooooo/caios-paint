@@ -631,9 +631,21 @@ body, html {
 }
 
 .stroke-slider {
-  width: 110px;
+  width: 130px;
   accent-color: var(--bg-accent);
   cursor: pointer;
+}
+
+.stroke-slider::-webkit-slider-runnable-track {
+  height: 6px;
+  border-radius: 3px;
+  background: var(--border-color-dark);
+}
+
+.stroke-slider::-moz-range-track {
+  height: 6px;
+  border-radius: 3px;
+  background: var(--border-color-dark);
 }
 
 .stroke-presets {
