@@ -335,6 +335,11 @@ body, html {
   margin-top: 4px;
 }
 
+.dropdown-menu.dropdown-right {
+  left: auto;
+  right: 0;
+}
+
 .dropdown-menu.show {
   display: block;
 }

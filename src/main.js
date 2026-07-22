@@ -55,26 +55,85 @@ class PaintApp {
     this.updateStatusSize();
   }
 
-  /* Theme System */
+  /* Theme System (System Auto / Light / Dark) */
   initTheme() {
-    const savedTheme = localStorage.getItem('paint_theme') || 'light';
-    document.documentElement.setAttribute('data-theme', savedTheme);
-    this.updateThemeIcon(savedTheme);
+    this.themeMode = localStorage.getItem('paint_theme_mode') || 'system';
+    this.mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
 
-    const btnToggle = document.getElementById('btnToggleTheme');
-    btnToggle.addEventListener('click', () => {
-      const current = document.documentElement.getAttribute('data-theme');
-      const next = current === 'dark' ? 'light' : 'dark';
-      document.documentElement.setAttribute('data-theme', next);
-      localStorage.setItem('paint_theme', next);
-      this.updateThemeIcon(next);
+    // Listen for OS System dark/light theme changes
+    if (this.mediaQuery.addEventListener) {
+      this.mediaQuery.addEventListener('change', () => {
+        if (this.themeMode === 'system') {
+          this.applyTheme();
+        }
+      });
+    }
+
+    // Top-Right Header Theme Dropdown Menu
+    this.setupDropdown('btnThemeMenu', 'menuTheme');
+
+    document.getElementById('themeOptSystem')?.addEventListener('click', () => this.setThemeMode('system'));
+    document.getElementById('themeOptLight')?.addEventListener('click', () => this.setThemeMode('light'));
+    document.getElementById('themeOptDark')?.addEventListener('click', () => this.setThemeMode('dark'));
+
+    // View Tab Ribbon Radio Options
+    document.querySelectorAll('input[name="ribbonTheme"]').forEach(radio => {
+      radio.addEventListener('change', (e) => {
+        this.setThemeMode(e.target.value);
+      });
     });
+
+    this.applyTheme();
   }
 
-  updateThemeIcon(theme) {
+  setThemeMode(mode) {
+    this.themeMode = mode;
+    localStorage.setItem('paint_theme_mode', mode);
+    this.applyTheme();
+  }
+
+  applyTheme() {
+    let effectiveTheme = 'light';
+    if (this.themeMode === 'system') {
+      effectiveTheme = this.mediaQuery.matches ? 'dark' : 'light';
+    } else {
+      effectiveTheme = this.themeMode;
+    }
+
+    document.documentElement.setAttribute('data-theme', effectiveTheme);
+
+    // Update Dropdown Checkmark Icons
+    const checkSys = document.getElementById('checkThemeSystem');
+    const checkLight = document.getElementById('checkThemeLight');
+    const checkDark = document.getElementById('checkThemeDark');
+
+    if (checkSys) checkSys.classList.toggle('hidden', this.themeMode !== 'system');
+    if (checkLight) checkLight.classList.toggle('hidden', this.themeMode !== 'light');
+    if (checkDark) checkDark.classList.toggle('hidden', this.themeMode !== 'dark');
+
+    // Update View Tab Radio Buttons
+    const radioSys = document.getElementById('radioThemeSystem');
+    const radioLight = document.getElementById('radioThemeLight');
+    const radioDark = document.getElementById('radioThemeDark');
+
+    if (radioSys) radioSys.checked = (this.themeMode === 'system');
+    if (radioLight) radioLight.checked = (this.themeMode === 'light');
+    if (radioDark) radioDark.checked = (this.themeMode === 'dark');
+
+    // Update Top-Right Header Icon & Tooltip
     const icon = document.getElementById('themeIcon');
+    const btn = document.getElementById('btnThemeMenu');
     if (icon) {
-      icon.setAttribute('data-lucide', theme === 'dark' ? 'sun' : 'moon');
+      if (this.themeMode === 'system') {
+        icon.setAttribute('data-lucide', 'laptop');
+        if (btn) btn.title = `Tema: Seguir Sistema (Atualmente ${effectiveTheme === 'dark' ? 'Escuro' : 'Claro'})`;
+      } else if (this.themeMode === 'dark') {
+        icon.setAttribute('data-lucide', 'moon');
+        if (btn) btn.title = 'Tema: Escuro';
+      } else {
+        icon.setAttribute('data-lucide', 'sun');
+        if (btn) btn.title = 'Tema: Claro';
+      }
       createIcons({ icons });
     }
   }

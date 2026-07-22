@@ -43,9 +43,37 @@
       </div>
 
       <div class="top-right-controls">
-        <button class="icon-btn" id="btnToggleTheme" title="Alternar Tema Claro/Escuro">
-          <i data-lucide="moon" id="themeIcon"></i>
-        </button>
+        <div class="dropdown-wrapper" style="position:relative;">
+          <button class="icon-btn" id="btnThemeMenu" title="Opções de Tema (Sistema / Claro / Escuro)">
+            <i data-lucide="laptop" id="themeIcon"></i>
+          </button>
+          <div class="dropdown-menu dropdown-right" id="menuTheme" style="min-width:210px;">
+            <div style="padding:6px 10px; font-size:11px; font-weight:700; color:var(--text-muted); border-bottom:1px solid var(--border-color); margin-bottom:4px;">
+              Aparência e Tema
+            </div>
+            <div class="dropdown-item" id="themeOptSystem" style="display:flex; justify-content:space-between; align-items:center;">
+              <div style="display:flex; align-items:center; gap:8px;">
+                <i data-lucide="laptop" style="width:16px;height:16px;"></i>
+                <span>Seguir Sistema (Auto)</span>
+              </div>
+              <i data-lucide="check" class="theme-check-icon" id="checkThemeSystem" style="width:14px;height:14px; color:var(--bg-accent);"></i>
+            </div>
+            <div class="dropdown-item" id="themeOptLight" style="display:flex; justify-content:space-between; align-items:center;">
+              <div style="display:flex; align-items:center; gap:8px;">
+                <i data-lucide="sun" style="width:16px;height:16px;"></i>
+                <span>Tema Claro</span>
+              </div>
+              <i data-lucide="check" class="theme-check-icon hidden" id="checkThemeLight" style="width:14px;height:14px; color:var(--bg-accent);"></i>
+            </div>
+            <div class="dropdown-item" id="themeOptDark" style="display:flex; justify-content:space-between; align-items:center;">
+              <div style="display:flex; align-items:center; gap:8px;">
+                <i data-lucide="moon" style="width:16px;height:16px;"></i>
+                <span>Tema Escuro</span>
+              </div>
+              <i data-lucide="check" class="theme-check-icon hidden" id="checkThemeDark" style="width:14px;height:14px; color:var(--bg-accent);"></i>
+            </div>
+          </div>
+        </div>
       </div>
     </header>
 
@@ -312,6 +340,30 @@
             </button>
           </div>
           <div class="ribbon-group-title">Zoom</div>
+        </div>
+
+        <!-- Group: Appearance / Theme -->
+        <div class="ribbon-group">
+          <div class="ribbon-group-content">
+            <div style="display:flex; flex-direction:column; gap:4px; padding:2px 6px;">
+              <label style="display:flex; align-items:center; gap:6px; font-size:12px; cursor:pointer; user-select:none;">
+                <input type="radio" name="ribbonTheme" value="system" id="radioThemeSystem" checked style="accent-color:var(--bg-accent);">
+                <i data-lucide="laptop" style="width:14px;height:14px;"></i>
+                <span>Seguir Sistema (Auto)</span>
+              </label>
+              <label style="display:flex; align-items:center; gap:6px; font-size:12px; cursor:pointer; user-select:none;">
+                <input type="radio" name="ribbonTheme" value="light" id="radioThemeLight" style="accent-color:var(--bg-accent);">
+                <i data-lucide="sun" style="width:14px;height:14px;"></i>
+                <span>Tema Claro</span>
+              </label>
+              <label style="display:flex; align-items:center; gap:6px; font-size:12px; cursor:pointer; user-select:none;">
+                <input type="radio" name="ribbonTheme" value="dark" id="radioThemeDark" style="accent-color:var(--bg-accent);">
+                <i data-lucide="moon" style="width:14px;height:14px;"></i>
+                <span>Tema Escuro</span>
+              </label>
+            </div>
+          </div>
+          <div class="ribbon-group-title">Aparência</div>
         </div>
       </div>
     </nav>
