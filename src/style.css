@@ -636,21 +636,37 @@ body, html {
 }
 
 .stroke-slider {
+  -webkit-appearance: none;
+  appearance: none;
   width: 130px;
-  accent-color: var(--bg-accent);
+  height: 6px;
+  border-radius: 3px;
+  background: var(--border-color-dark);
+  outline: none;
   cursor: pointer;
+  margin: 4px 0;
 }
 
-.stroke-slider::-webkit-slider-runnable-track {
-  height: 6px;
-  border-radius: 3px;
-  background: var(--border-color-dark);
+.stroke-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--bg-accent);
+  cursor: pointer;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+  border: 2px solid #ffffff;
 }
 
-.stroke-slider::-moz-range-track {
-  height: 6px;
-  border-radius: 3px;
-  background: var(--border-color-dark);
+.stroke-slider::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--bg-accent);
+  cursor: pointer;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+  border: 2px solid #ffffff;
 }
 
 .stroke-presets {

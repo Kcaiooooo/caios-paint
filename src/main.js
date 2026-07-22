@@ -238,21 +238,23 @@ class PaintApp {
 
     if (strokeRange) {
       strokeRange.addEventListener('input', (e) => {
-        this.setStrokeSize(parseInt(e.target.value));
+        const val = parseInt(e.target.value);
+        if (!isNaN(val)) this.setStrokeSize(val, true);
       });
       strokeRange.addEventListener('change', (e) => {
-        this.setStrokeSize(parseInt(e.target.value));
+        const val = parseInt(e.target.value);
+        if (!isNaN(val)) this.setStrokeSize(val, true);
       });
     }
 
     if (strokeNum) {
       strokeNum.addEventListener('input', (e) => {
         const val = parseInt(e.target.value);
-        if (!isNaN(val)) this.setStrokeSize(val);
+        if (!isNaN(val)) this.setStrokeSize(val, false);
       });
       strokeNum.addEventListener('change', (e) => {
         const val = parseInt(e.target.value);
-        if (!isNaN(val)) this.setStrokeSize(val);
+        if (!isNaN(val)) this.setStrokeSize(val, false);
       });
     }
 
@@ -373,7 +375,7 @@ class PaintApp {
     }
   }
 
-  setStrokeSize(size) {
+  setStrokeSize(size, skipRangeSync = false) {
     size = Math.max(1, Math.min(500, parseInt(size) || 1));
     this.currentSize = size;
 
@@ -382,7 +384,9 @@ class PaintApp {
     const strokeVal = document.getElementById('strokeSizeVal');
     const strokeDot = document.getElementById('strokeDot');
 
-    if (strokeRange) strokeRange.value = Math.min(200, size);
+    if (strokeRange && !skipRangeSync) {
+      strokeRange.value = Math.min(200, size);
+    }
     if (strokeNum) strokeNum.value = size;
     if (strokeVal) strokeVal.textContent = `${size}px`;
 
