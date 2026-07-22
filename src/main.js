@@ -1,3 +1,4 @@
+import './style.css';
 import { createIcons, icons } from 'lucide';
 import { CanvasManager } from './canvas.js';
 import { HistoryManager } from './history.js';
