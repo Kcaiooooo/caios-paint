@@ -21,7 +21,12 @@ export class DialogManager {
 
   openModal(modalId) {
     const modal = document.getElementById(modalId);
-    if (modal) modal.classList.add('show');
+    if (modal) {
+      modal.classList.add('show');
+      if (modalId === 'modalColorPicker' && this.syncColorPickerWithActiveColor) {
+        this.syncColorPickerWithActiveColor();
+      }
+    }
   }
 
   closeModal(modalId) {
@@ -93,57 +98,113 @@ export class DialogManager {
     const inputB = document.getElementById('inputB');
     const inputHex = document.getElementById('inputHex');
     const btnAdd = document.getElementById('btnAddCustomColor');
+    const btnNative = document.getElementById('btnNativeColorPicker');
+    const nativeColorInput = document.getElementById('nativeColorInput');
 
     if (!spectrumCanvas) return;
 
     const sCtx = spectrumCanvas.getContext('2d');
-    let currentHue = 0;
+    const width = 240;
+    const height = 200;
+
+    let currentHue = 0;   // 0 .. 360
+    let currentSat = 1.0; // 0 .. 1
+    let currentVal = 1.0; // 0 .. 1
     let selectedHex = '#000000';
+    let isDraggingCanvas = false;
 
-    const drawSpectrum = () => {
-      sCtx.clearRect(0, 0, 220, 200);
+    const renderSpectrum = () => {
+      // 1. Fill base rectangle with pure Hue color
+      const [hr, hg, hb] = this.hsvToRgb(currentHue, 1.0, 1.0);
+      sCtx.fillStyle = `rgb(${hr}, ${hg}, ${hb})`;
+      sCtx.fillRect(0, 0, width, height);
 
-      // Draw Saturation (horizontal) and Value (vertical) gradient
-      for (let x = 0; x < 220; x++) {
-        const sat = x / 220;
-        const grad = sCtx.createLinearGradient(0, 0, 0, 200);
-        const rgbStr = this.hsvToRgbStr(currentHue, sat, 1.0);
-        grad.addColorStop(0, rgbStr);
-        grad.addColorStop(1, '#000000');
+      // 2. Horizontal gradient overlay (white -> transparent)
+      const gradWhite = sCtx.createLinearGradient(0, 0, width, 0);
+      gradWhite.addColorStop(0, '#ffffff');
+      gradWhite.addColorStop(1, 'rgba(255, 255, 255, 0)');
+      sCtx.fillStyle = gradWhite;
+      sCtx.fillRect(0, 0, width, height);
 
-        sCtx.fillStyle = grad;
-        sCtx.fillRect(x, 0, 1, 200);
+      // 3. Vertical gradient overlay (transparent -> black)
+      const gradBlack = sCtx.createLinearGradient(0, 0, 0, height);
+      gradBlack.addColorStop(0, 'rgba(0, 0, 0, 0)');
+      gradBlack.addColorStop(1, '#000000');
+      sCtx.fillStyle = gradBlack;
+      sCtx.fillRect(0, 0, width, height);
+
+      // 4. Reticle indicator at currentSat, currentVal
+      const rx = currentSat * width;
+      const ry = (1.0 - currentVal) * height;
+
+      sCtx.save();
+      // Outer ring
+      sCtx.strokeStyle = '#ffffff';
+      sCtx.lineWidth = 2.5;
+      sCtx.beginPath();
+      sCtx.arc(rx, ry, 6, 0, Math.PI * 2);
+      sCtx.stroke();
+      // Inner ring
+      sCtx.strokeStyle = '#000000';
+      sCtx.lineWidth = 1.5;
+      sCtx.beginPath();
+      sCtx.arc(rx, ry, 6, 0, Math.PI * 2);
+      sCtx.stroke();
+      sCtx.restore();
+    };
+
+    const updatePreviewAndInputs = (skipInputSync = false) => {
+      selectedHex = this.hsvToHex(currentHue, currentSat, currentVal);
+      colorPreviewBox.style.backgroundColor = selectedHex;
+      colorPreviewHex.textContent = selectedHex.toUpperCase();
+
+      if (!skipInputSync) {
+        inputHex.value = selectedHex.toUpperCase();
+        const [r, g, b] = this.hsvToRgb(currentHue, currentSat, currentVal);
+        inputR.value = r;
+        inputG.value = g;
+        inputB.value = b;
       }
     };
 
-    drawSpectrum();
+    const handleCanvasPointer = (e) => {
+      const rect = spectrumCanvas.getBoundingClientRect();
+      const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+      const clientY = e.touches ? e.touches[0].clientY : e.clientY;
 
-    hueSlider.addEventListener('input', (e) => {
-      currentHue = parseInt(e.target.value);
-      drawSpectrum();
-    });
+      const x = Math.max(0, Math.min(width, clientX - rect.left));
+      const y = Math.max(0, Math.min(height, clientY - rect.top));
 
-    const updatePreview = (hex) => {
-      selectedHex = hex;
-      colorPreviewBox.style.backgroundColor = hex;
-      colorPreviewHex.textContent = hex.toUpperCase();
-      inputHex.value = hex.toUpperCase();
+      currentSat = x / width;
+      currentVal = 1.0 - y / height;
 
-      const [r, g, b] = this.hexToRgb(hex);
-      inputR.value = r;
-      inputG.value = g;
-      inputB.value = b;
+      renderSpectrum();
+      updatePreviewAndInputs();
     };
 
-    spectrumCanvas.addEventListener('click', (e) => {
-      const rect = spectrumCanvas.getBoundingClientRect();
-      const x = Math.max(0, Math.min(219, Math.floor(e.clientX - rect.left)));
-      const y = Math.max(0, Math.min(199, Math.floor(e.clientY - rect.top)));
+    spectrumCanvas.addEventListener('pointerdown', (e) => {
+      isDraggingCanvas = true;
+      spectrumCanvas.setPointerCapture(e.pointerId);
+      handleCanvasPointer(e);
+    });
 
-      const sat = x / 220;
-      const val = 1.0 - y / 200;
-      const hex = this.hsvToHex(currentHue, sat, val);
-      updatePreview(hex);
+    spectrumCanvas.addEventListener('pointermove', (e) => {
+      if (isDraggingCanvas) {
+        handleCanvasPointer(e);
+      }
+    });
+
+    spectrumCanvas.addEventListener('pointerup', (e) => {
+      if (isDraggingCanvas) {
+        isDraggingCanvas = false;
+        try { spectrumCanvas.releasePointerCapture(e.pointerId); } catch (_) {}
+      }
+    });
+
+    hueSlider.addEventListener('input', (e) => {
+      currentHue = parseFloat(e.target.value);
+      renderSpectrum();
+      updatePreviewAndInputs();
     });
 
     [inputR, inputG, inputB].forEach(input => {
@@ -151,16 +212,81 @@ export class DialogManager {
         const r = Math.min(255, Math.max(0, parseInt(inputR.value) || 0));
         const g = Math.min(255, Math.max(0, parseInt(inputG.value) || 0));
         const b = Math.min(255, Math.max(0, parseInt(inputB.value) || 0));
-        const hex = this.rgbToHex(r, g, b);
-        updatePreview(hex);
+        const [h, s, v] = this.rgbToHsv(r, g, b);
+        currentHue = h;
+        currentSat = s;
+        currentVal = v;
+        hueSlider.value = Math.round(currentHue);
+        selectedHex = this.rgbToHex(r, g, b);
+        colorPreviewBox.style.backgroundColor = selectedHex;
+        colorPreviewHex.textContent = selectedHex.toUpperCase();
+        inputHex.value = selectedHex.toUpperCase();
+        renderSpectrum();
       });
     });
 
     inputHex.addEventListener('input', () => {
-      if (/^#[0-9A-F]{6}$/i.test(inputHex.value)) {
-        updatePreview(inputHex.value);
+      let val = inputHex.value.trim();
+      if (!val.startsWith('#')) val = '#' + val;
+      if (/^#[0-9A-F]{6}$/i.test(val)) {
+        const [r, g, b] = this.hexToRgb(val);
+        const [h, s, v] = this.rgbToHsv(r, g, b);
+        currentHue = h;
+        currentSat = s;
+        currentVal = v;
+        hueSlider.value = Math.round(currentHue);
+        selectedHex = val.toUpperCase();
+        colorPreviewBox.style.backgroundColor = selectedHex;
+        colorPreviewHex.textContent = selectedHex;
+        inputR.value = r;
+        inputG.value = g;
+        inputB.value = b;
+        renderSpectrum();
       }
     });
+
+    if (btnNative && nativeColorInput) {
+      btnNative.addEventListener('click', () => {
+        nativeColorInput.value = selectedHex.length === 7 ? selectedHex : '#000000';
+        nativeColorInput.click();
+      });
+
+      nativeColorInput.addEventListener('input', (e) => {
+        const hex = e.target.value;
+        const [r, g, b] = this.hexToRgb(hex);
+        const [h, s, v] = this.rgbToHsv(r, g, b);
+        currentHue = h;
+        currentSat = s;
+        currentVal = v;
+        hueSlider.value = Math.round(currentHue);
+        selectedHex = hex.toUpperCase();
+        colorPreviewBox.style.backgroundColor = selectedHex;
+        colorPreviewHex.textContent = selectedHex;
+        inputHex.value = selectedHex;
+        inputR.value = r;
+        inputG.value = g;
+        inputB.value = b;
+        renderSpectrum();
+      });
+    }
+
+    this.syncColorPickerWithActiveColor = () => {
+      const activeHex = this.paletteManager.activeSlot === 1 ? this.paletteManager.color1 : this.paletteManager.color2;
+      const [r, g, b] = this.hexToRgb(activeHex || '#000000');
+      const [h, s, v] = this.rgbToHsv(r, g, b);
+      currentHue = h;
+      currentSat = s;
+      currentVal = v;
+      hueSlider.value = Math.round(currentHue);
+      selectedHex = activeHex.toUpperCase();
+      colorPreviewBox.style.backgroundColor = selectedHex;
+      colorPreviewHex.textContent = selectedHex;
+      inputHex.value = selectedHex;
+      inputR.value = r;
+      inputG.value = g;
+      inputB.value = b;
+      renderSpectrum();
+    };
 
     btnAdd.addEventListener('click', () => {
       this.paletteManager.addCustomColor(selectedHex);
@@ -198,10 +324,29 @@ export class DialogManager {
     return [Math.round(r * 255), Math.round(g * 255), Math.round(b * 255)];
   }
 
+  rgbToHsv(r, g, b) {
+    r /= 255; g /= 255; b /= 255;
+    const max = Math.max(r, g, b), min = Math.min(r, g, b);
+    let h = 0;
+    const v = max;
+    const d = max - min;
+    const s = max === 0 ? 0 : d / max;
+
+    if (max !== min) {
+      switch (max) {
+        case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+        case g: h = (b - r) / d + 2; break;
+        case b: h = (r - g) / d + 4; break;
+      }
+      h *= 60;
+    }
+    return [h, s, v];
+  }
+
   hexToRgb(hex) {
-    let c = hex.replace('#', '');
+    let c = (hex || '#000000').replace('#', '');
     if (c.length === 3) c = c.split('').map(x => x + x).join('');
-    const num = parseInt(c, 16);
+    const num = parseInt(c, 16) || 0;
     return [(num >> 16) & 255, (num >> 8) & 255, num & 255];
   }
 

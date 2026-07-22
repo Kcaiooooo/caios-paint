@@ -397,40 +397,53 @@
 
   <!-- 2. Custom Color Picker Modal -->
   <div class="modal-overlay" id="modalColorPicker">
-    <div class="modal-card" style="width:480px;">
+    <div class="modal-card" style="width:500px;">
       <div class="modal-header">
         <span>Editar Cores</span>
         <button class="icon-btn modal-close" data-modal="modalColorPicker"><i data-lucide="x"></i></button>
       </div>
-      <div class="modal-body" style="flex-direction:row; gap:16px;">
+      <div class="modal-body" style="flex-direction:row; gap:20px; padding:20px;">
         <!-- Canvas Palette & Spectrum -->
-        <div style="display:flex; flex-direction:column; gap:8px;">
-          <canvas id="colorSpectrum" width="220" height="200" style="cursor:crosshair; border:1px solid var(--border-color);"></canvas>
-          <input type="range" id="hueSlider" min="0" max="360" value="0" style="width:220px; accent-color:var(--bg-accent);">
+        <div style="display:flex; flex-direction:column; gap:12px; width:240px;">
+          <div style="position:relative;">
+            <canvas id="colorSpectrum" width="240" height="200" style="cursor:crosshair; border:1px solid var(--border-color); display:block; touch-action:none;"></canvas>
+          </div>
+          <div style="display:flex; flex-direction:column; gap:4px;">
+            <label style="font-size:11px; font-weight:600; color:var(--text-muted);">Matiz (Cor Base):</label>
+            <input type="range" id="hueSlider" min="0" max="360" value="0">
+          </div>
         </div>
         <!-- Color Info & Inputs -->
         <div style="display:flex; flex-direction:column; gap:10px; flex:1;">
-          <div style="display:flex; gap:8px; align-items:center;">
-            <div id="colorPreviewBox" style="width:50px; height:50px; border-radius:var(--radius-sm); border:1px solid #000; background:#000;"></div>
-            <div>
-              <div style="font-weight:600;" id="colorPreviewHex">#000000</div>
+          <div style="display:flex; gap:12px; align-items:center; background:var(--bg-surface-secondary); padding:10px; border-radius:var(--radius-sm); border:1px solid var(--border-color);">
+            <div id="colorPreviewBox" style="width:44px; height:44px; border-radius:var(--radius-sm); border:1px solid rgba(0,0,0,0.3); background:#000; box-shadow:var(--shadow-sm);"></div>
+            <div style="display:flex; flex-direction:column;">
+              <span style="font-size:11px; color:var(--text-muted); font-weight:500;">Cor Selecionada</span>
+              <span style="font-weight:700; font-size:15px; font-family:monospace;" id="colorPreviewHex">#000000</span>
             </div>
           </div>
           <div class="form-row">
-            <label style="width:20px;">R:</label>
+            <label style="width:30px; font-weight:600;">R:</label>
             <input type="number" class="form-input" id="inputR" min="0" max="255" value="0">
           </div>
           <div class="form-row">
-            <label style="width:20px;">G:</label>
+            <label style="width:30px; font-weight:600;">G:</label>
             <input type="number" class="form-input" id="inputG" min="0" max="255" value="0">
           </div>
           <div class="form-row">
-            <label style="width:20px;">B:</label>
+            <label style="width:30px; font-weight:600;">B:</label>
             <input type="number" class="form-input" id="inputB" min="0" max="255" value="0">
           </div>
           <div class="form-row">
-            <label style="width:30px;">HEX:</label>
-            <input type="text" class="form-input" id="inputHex" value="#000000">
+            <label style="width:30px; font-weight:600;">HEX:</label>
+            <input type="text" class="form-input" id="inputHex" value="#000000" style="font-family:monospace; text-transform:uppercase;">
+          </div>
+          <div style="margin-top:2px;">
+            <button type="button" class="btn-secondary" id="btnNativeColorPicker" style="width:100%; display:flex; align-items:center; justify-content:center; gap:6px; font-size:12px; padding:6px 10px;">
+              <i data-lucide="pipette" style="width:14px; height:14px;"></i>
+              <span>Seletor do Sistema...</span>
+            </button>
+            <input type="color" id="nativeColorInput" style="display:none;">
           </div>
         </div>
       </div>
