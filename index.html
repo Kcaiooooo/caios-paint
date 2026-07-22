@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Paint Master - Editor de Imagens Rápido</title>
+  <link rel="stylesheet" href="/src/style.css">
+</head>
+<body>
+  <div id="app">
+    <!-- Top Header Bar -->
+    <header class="top-bar">
+      <div class="top-left-controls">
+        <!-- File Menu Button -->
+        <div class="dropdown-tool">
+          <button class="menu-button" id="fileMenuBtn">
+            <i data-lucide="menu"></i>
+            <span>Arquivo</span>
+          </button>
+          <div class="dropdown-menu" id="fileDropdown">
+            <div class="dropdown-item" id="menuNew"><i data-lucide="file-plus"></i> Novo (Alt+N)</div>
+            <div class="dropdown-item" id="menuOpen"><i data-lucide="folder-open"></i> Abrir (Ctrl+O)</div>
+            <div class="dropdown-divider"></div>
+            <div class="dropdown-item" id="menuSave"><i data-lucide="save"></i> Salvar (Ctrl+S)</div>
+            <div class="dropdown-item" id="menuSaveAs"><i data-lucide="download"></i> Salvar Como...</div>
+            <div class="dropdown-divider"></div>
+            <div class="dropdown-item" id="menuResize"><i data-lucide="scaling"></i> Redimensionar Tela</div>
+          </div>
+        </div>
+
+        <!-- Quick Access Actions -->
+        <div class="quick-actions">
+          <button class="icon-btn" id="btnUndo" title="Desfazer (Ctrl+Z)" disabled>
+            <i data-lucide="undo-2"></i>
+          </button>
+          <button class="icon-btn" id="btnRedo" title="Refazer (Ctrl+Y)" disabled>
+            <i data-lucide="redo-2"></i>
+          </button>
+          <button class="icon-btn" id="btnQuickSave" title="Salvar (Ctrl+S)">
+            <i data-lucide="save"></i>
+          </button>
+        </div>
+        <span class="app-title" id="documentTitle">Sem título - Paint Master</span>
+      </div>
+
+      <div class="top-right-controls">
+        <button class="icon-btn" id="btnToggleTheme" title="Alternar Tema Claro/Escuro">
+          <i data-lucide="moon" id="themeIcon"></i>
+        </button>
+      </div>
+    </header>
+
+    <!-- Main Ribbon Toolbar -->
+    <nav class="ribbon-container">
+      <div class="ribbon-tabs">
+        <button class="tab-btn active" data-tab="home">Início</button>
+        <button class="tab-btn" data-tab="view">Exibir</button>
+      </div>
+
+      <!-- Home Tab Toolbar -->
+      <div class="ribbon-toolbar" id="toolbarHome">
+        <!-- Group: Clipboard -->
+        <div class="ribbon-group">
+          <div class="ribbon-group-content">
+            <button class="btn-large" id="btnPaste" title="Colar Imagem (Ctrl+V)">
+              <i data-lucide="clipboard-paste" style="width:24px;height:24px;"></i>
+              <span>Colar</span>
+            </button>
+            <div class="btn-group-stacked">
+              <button class="btn-small-text" id="btnCut" title="Recortar Seleção (Ctrl+X)">
+                <i data-lucide="scissors"></i> Recortar
+              </button>
+              <button class="btn-small-text" id="btnCopy" title="Copiar Seleção (Ctrl+C)">
+                <i data-lucide="copy"></i> Copiar
+              </button>
+            </div>
+          </div>
+          <div class="ribbon-group-title">Área de Transferência</div>
+        </div>
+
+        <!-- Group: Image & Selection -->
+        <div class="ribbon-group">
+          <div class="ribbon-group-content">
+            <!-- Selection Dropdown -->
+            <div class="dropdown-tool">
+              <button class="btn-large" id="btnSelectMenu" title="Opções de Seleção">
+                <i data-lucide="square-dashed" style="width:22px;height:22px;"></i>
+                <span>Selecionar</span>
+              </button>
+              <div class="dropdown-menu" id="selectDropdown">
+                <div class="dropdown-item active" id="selRect"><i data-lucide="square-dashed"></i> Seleção Retangular</div>
+                <div class="dropdown-item" id="selFree"><i data-lucide="spline"></i> Seleção Livre</div>
+                <div class="dropdown-divider"></div>
+                <div class="dropdown-item" id="selAll"><i data-lucide="check-square"></i> Selecionar Tudo (Ctrl+A)</div>
+                <div class="dropdown-divider"></div>
+                <div class="dropdown-item" id="selTransparent">
+                  <i data-lucide="ghost"></i>
+                  <span id="transparencyCheckLabel">☐ Seleção Transparente</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="btn-group-stacked">
+              <button class="btn-small-text" id="btnCrop" title="Cortar para Seleção">
+                <i data-lucide="crop"></i> Cortar
+              </button>
+              <button class="btn-small-text" id="btnResizeModal" title="Redimensionar/Inclinar (Ctrl+W)">
+                <i data-lucide="scaling"></i> Redimensionar
+              </button>
+              <!-- Rotate Dropdown -->
+              <div class="dropdown-tool">
+                <button class="btn-small-text" id="btnRotateMenu">
+                  <i data-lucide="rotate-cw"></i> Girar ▾
+                </button>
+                <div class="dropdown-menu" id="rotateDropdown">
+                  <div class="dropdown-item" id="rot90cw"><i data-lucide="rotate-cw"></i> Girar 90° à direita</div>
+                  <div class="dropdown-item" id="rot90ccw"><i data-lucide="rotate-ccw"></i> Girar 90° à esquerda</div>
+                  <div class="dropdown-item" id="rot180"><i data-lucide="refresh-cw"></i> Girar 180°</div>
+                  <div class="dropdown-divider"></div>
+                  <div class="dropdown-item" id="flipVert"><i data-lucide="flip-vertical"></i> Inverter verticalmente</div>
+                  <div class="dropdown-item" id="flipHoriz"><i data-lucide="flip-horizontal"></i> Inverter horizontalmente</div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="ribbon-group-title">Imagem</div>
+        </div>
+
+        <!-- Group: Tools -->
+        <div class="ribbon-group">
+          <div class="ribbon-group-content">
+            <div class="tools-grid">
+              <button class="tool-btn active" id="toolPencil" data-tool="pencil" title="Lápis (P)">
+                <i data-lucide="pencil"></i>
+              </button>
+              <button class="tool-btn" id="toolFill" data-tool="fill" title="Preencher com Cor / Balde (B)">
+                <i data-lucide="paint-bucket"></i>
+              </button>
+              <button class="tool-btn" id="toolText" data-tool="text" title="Texto (T)">
+                <i data-lucide="type"></i>
+              </button>
+              <button class="tool-btn" id="toolEraser" data-tool="eraser" title="Borracha (E)">
+                <i data-lucide="eraser"></i>
+              </button>
+              <button class="tool-btn" id="toolEyedropper" data-tool="eyedropper" title="Selecionar Cor / Conta-gotas (I)">
+                <i data-lucide="pipette"></i>
+              </button>
+              <button class="tool-btn" id="toolZoom" data-tool="zoom" title="Lupa / Zoom (Z)">
+                <i data-lucide="search"></i>
+              </button>
+            </div>
+          </div>
+          <div class="ribbon-group-title">Ferramentas</div>
+        </div>
+
+        <!-- Group: Brushes -->
+        <div class="ribbon-group">
+          <div class="ribbon-group-content">
+            <div class="dropdown-tool">
+              <button class="btn-large" id="btnBrushMenu" title="Escolher Pincel">
+                <i data-lucide="paint-brush" id="currentBrushIcon" style="width:24px;height:24px;"></i>
+                <span id="currentBrushLabel">Pincel</span>
+              </button>
+              <div class="dropdown-menu" id="brushDropdown" style="min-width:200px;">
+                <div class="dropdown-item active" data-brush="round"><i data-lucide="circle"></i> Pincel Redondo (Padrão)</div>
+                <div class="dropdown-item" data-brush="calligraphy1"><i data-lucide="pen-tool"></i> Caligrafia 1</div>
+                <div class="dropdown-item" data-brush="calligraphy2"><i data-lucide="feather"></i> Caligrafia 2</div>
+                <div class="dropdown-item" data-brush="airbrush"><i data-lucide="spray-can"></i> Aerógrafo (Spray)</div>
+                <div class="dropdown-item" data-brush="oil"><i data-lucide="brush"></i> Pincel a Óleo</div>
+                <div class="dropdown-item" data-brush="crayon"><i data-lucide="palette"></i> Giz de Cera</div>
+                <div class="dropdown-item" data-brush="marker"><i data-lucide="highlighter"></i> Marcador</div>
+                <div class="dropdown-item" data-brush="pencil_nat"><i data-lucide="pencil-line"></i> Lápis Natural</div>
+                <div class="dropdown-item" data-brush="watercolor"><i data-lucide="droplet"></i> Pincel de Aquarela</div>
+              </div>
+            </div>
+          </div>
+          <div class="ribbon-group-title">Pincéis</div>
+        </div>
+
+        <!-- Group: Shapes -->
+        <div class="ribbon-group">
+          <div class="ribbon-group-content" style="flex-direction:column; gap:4px;">
+            <div class="shapes-picker" id="shapesPicker">
+              <button class="shape-item active" data-shape="line" title="Linha Reta"><i data-lucide="minus"></i></button>
+              <button class="shape-item" data-shape="curve" title="Linha Curva Bezier"><i data-lucide="spline"></i></button>
+              <button class="shape-item" data-shape="oval" title="Elipse / Círculo"><i data-lucide="circle"></i></button>
+              <button class="shape-item" data-shape="rect" title="Retângulo"><i data-lucide="square"></i></button>
+              <button class="shape-item" data-shape="round_rect" title="Retângulo Arredondado"><i data-lucide="square-dashed"></i></button>
+              <button class="shape-item" data-shape="polygon" title="Polígono"><i data-lucide="hexagon"></i></button>
+              <button class="shape-item" data-shape="triangle" title="Triângulo"><i data-lucide="triangle"></i></button>
+              <button class="shape-item" data-shape="right_triangle" title="Triângulo Retângulo"><i data-lucide="triangle-right"></i></button>
+              <button class="shape-item" data-shape="diamond" title="Losango"><i data-lucide="diamond"></i></button>
+              <button class="shape-item" data-shape="pentagon" title="Pentágono"><i data-lucide="pentagon"></i></button>
+              <button class="shape-item" data-shape="star" title="Estrela de 5 Pontas"><i data-lucide="star"></i></button>
+              <button class="shape-item" data-shape="arrow_right" title="Seta para Direita"><i data-lucide="arrow-right"></i></button>
+              <button class="shape-item" data-shape="speech_rect" title="Balão de Fala"><i data-lucide="message-square"></i></button>
+              <button class="shape-item" data-shape="heart" title="Coração"><i data-lucide="heart"></i></button>
+              <button class="shape-item" data-shape="lightning" title="Raio"><i data-lucide="zap"></i></button>
+            </div>
+            
+            <div style="display:flex; gap:6px; width:100%;">
+              <div class="dropdown-tool" style="flex:1;">
+                <button class="btn-small-text" id="btnOutlineStyle">Contorno ▾</button>
+                <div class="dropdown-menu" id="outlineDropdown">
+                  <div class="dropdown-item" data-outline="none">Sem contorno</div>
+                  <div class="dropdown-item active" data-outline="solid">Cor sólida</div>
+                  <div class="dropdown-item" data-outline="crayon">Giz de cera</div>
+                  <div class="dropdown-item" data-outline="marker">Marcador</div>
+                  <div class="dropdown-item" data-outline="oil">Óleo</div>
+                  <div class="dropdown-item" data-outline="natural">Lápis natural</div>
+                  <div class="dropdown-item" data-outline="watercolor">Aquarela</div>
+                </div>
+              </div>
+              <div class="dropdown-tool" style="flex:1;">
+                <button class="btn-small-text" id="btnFillStyle">Preenchimento ▾</button>
+                <div class="dropdown-menu" id="fillStyleDropdown">
+                  <div class="dropdown-item active" data-fill="none">Sem preenchimento</div>
+                  <div class="dropdown-item" data-fill="solid">Cor sólida</div>
+                  <div class="dropdown-item" data-fill="crayon">Giz de cera</div>
+                  <div class="dropdown-item" data-fill="marker">Marcador</div>
+                  <div class="dropdown-item" data-fill="oil">Óleo</div>
+                  <div class="dropdown-item" data-fill="natural">Lápis natural</div>
+                  <div class="dropdown-item" data-fill="watercolor">Aquarela</div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="ribbon-group-title">Formas</div>
+        </div>
+
+        <!-- Group: Size (Stroke Width) -->
+        <div class="ribbon-group">
+          <div class="ribbon-group-content">
+            <div class="stroke-control-bar">
+              <!-- Circle Dot Preview -->
+              <div class="stroke-preview-circle" title="Espessura atual (Alt + Roda do Mouse para alterar)">
+                <div class="stroke-dot" id="strokeDot" style="width: 3px; height: 3px;"></div>
+              </div>
+
+              <!-- Slider & Presets Group -->
+              <div class="stroke-slider-group">
+                <div class="stroke-slider-header">
+                  <span>Espessura</span>
+                  <span id="strokeSizeVal" style="font-weight:600; color:var(--text-main);">3px</span>
+                </div>
+                <input type="range" class="stroke-slider" id="strokeSizeRange" min="1" max="50" value="3" title="Ajuste o tamanho (1px a 50px)">
+                
+                <div class="stroke-presets" id="strokePresets">
+                  <button class="preset-chip" data-size="1">1px</button>
+                  <button class="preset-chip active" data-size="3">3px</button>
+                  <button class="preset-chip" data-size="5">5px</button>
+                  <button class="preset-chip" data-size="8">8px</button>
+                  <button class="preset-chip" data-size="12">12px</button>
+                  <button class="preset-chip" data-size="20">20px</button>
+                  <button class="preset-chip" data-size="30">30px</button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="ribbon-group-title">Tamanho</div>
+        </div>
+
+        <!-- Group: Color Palette -->
+        <div class="ribbon-group" style="border-right:none;">
+          <div class="ribbon-group-content">
+            <div class="color-system">
+              <!-- Color Slots 1 & 2 -->
+              <div class="color-slots">
+                <div class="color-box-wrapper active" id="slotColor1Wrapper">
+                  <div class="color-box" id="slotColor1" style="background-color:#000000;"></div>
+                  <label>Cor 1</label>
+                </div>
+                <div class="color-box-wrapper" id="slotColor2Wrapper">
+                  <div class="color-box" id="slotColor2" style="background-color:#ffffff;"></div>
+                  <label>Cor 2</label>
+                </div>
+              </div>
+
+              <!-- Swatch Grid -->
+              <div class="color-palette-grid" id="paletteGrid">
+                <!-- Swatches rendered dynamically -->
+              </div>
+
+              <!-- Custom Colors Editor Button -->
+              <button class="edit-colors-btn" id="btnEditColors" title="Editar Cores Personalizadas">
+                <i data-lucide="palette" style="width:24px;height:24px;"></i>
+                <span>Editar Cores</span>
+              </button>
+            </div>
+          </div>
+          <div class="ribbon-group-title">Cores</div>
+        </div>
+      </div>
+
+      <!-- View Tab Toolbar -->
+      <div class="ribbon-toolbar hidden" id="toolbarView">
+        <div class="ribbon-group">
+          <div class="ribbon-group-content">
+            <button class="btn-large" id="btnZoomIn">
+              <i data-lucide="zoom-in"></i>
+              <span>Ampliar</span>
+            </button>
+            <button class="btn-large" id="btnZoomOut">
+              <i data-lucide="zoom-out"></i>
+              <span>Reduzir</span>
+            </button>
+            <button class="btn-large" id="btnZoom100">
+              <i data-lucide="maximize-2"></i>
+              <span>100%</span>
+            </button>
+          </div>
+          <div class="ribbon-group-title">Zoom</div>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Canvas Viewport -->
+    <main class="viewport" id="viewport">
+      <div class="canvas-scroll-wrapper" id="canvasScrollWrapper">
+        <div class="canvas-container" id="canvasContainer">
+          <canvas id="mainCanvas" width="1280" height="720"></canvas>
+          <canvas id="overlayCanvas" width="1280" height="720"></canvas>
+          
+          <!-- Interactive Resize Handles -->
+          <div class="resize-handle r" id="handleRight"></div>
+          <div class="resize-handle b" id="handleBottom"></div>
+          <div class="resize-handle rb" id="handleCorner"></div>
+          
+          <div class="resize-tooltip" id="resizeTooltip">1280 x 720px</div>
+        </div>
+      </div>
+    </main>
+
+    <!-- Bottom Status Bar -->
+    <footer class="status-bar">
+      <div class="status-left">
+        <div class="status-item" id="statusPos">
+          <i data-lucide="crosshair"></i> <span>0, 0px</span>
+        </div>
+        <div class="status-item" id="statusSel" style="display:none;">
+          <i data-lucide="square-dashed"></i> <span>0 x 0px</span>
+        </div>
+        <div class="status-item" id="statusSize">
+          <i data-lucide="frame"></i> <span>1280 x 720px</span>
+        </div>
+      </div>
+
+      <div class="status-right">
+        <button class="icon-btn" id="btnFitScreen" title="Ajustar à Tela">
+          <i data-lucide="monitor"></i>
+        </button>
+        <div class="zoom-controls">
+          <button class="icon-btn" id="btnZoomMinus">-</button>
+          <input type="range" class="zoom-slider" id="zoomRange" min="10" max="800" value="100">
+          <button class="icon-btn" id="btnZoomPlus">+</button>
+          <span id="zoomLabel" style="width:40px; text-align:right;">100%</span>
+        </div>
+      </div>
+    </footer>
+  </div>
+
+  <!-- Modals -->
+  <!-- 1. Resize & Skew Modal -->
+  <div class="modal-overlay" id="modalResize">
+    <div class="modal-card">
+      <div class="modal-header">
+        <span>Redimensionar e Inclinar</span>
+        <button class="icon-btn modal-close" data-modal="modalResize"><i data-lucide="x"></i></button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label>Redimensionar Por:</label>
+          <div style="display:flex; gap:16px;">
+            <label><input type="radio" name="resizeUnit" value="percent" checked> Porcentagem</label>
+            <label><input type="radio" name="resizeUnit" value="pixels"> Pixels</label>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group" style="flex:1;">
+            <label>Horizontal:</label>
+            <input type="number" class="form-input" id="resizeH" value="100" min="1">
+          </div>
+          <div class="form-group" style="flex:1;">
+            <label>Vertical:</label>
+            <input type="number" class="form-input" id="resizeV" value="100" min="1">
+          </div>
+        </div>
+        <div class="form-group">
+          <label><input type="checkbox" id="chkAspect" checked> Manter taxa de proporção</label>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-secondary modal-close" data-modal="modalResize">Cancelar</button>
+        <button class="btn-primary" id="btnApplyResize">OK</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2. Custom Color Picker Modal -->
+  <div class="modal-overlay" id="modalColorPicker">
+    <div class="modal-card" style="width:480px;">
+      <div class="modal-header">
+        <span>Editar Cores</span>
+        <button class="icon-btn modal-close" data-modal="modalColorPicker"><i data-lucide="x"></i></button>
+      </div>
+      <div class="modal-body" style="flex-direction:row; gap:16px;">
+        <!-- Canvas Palette & Spectrum -->
+        <div style="display:flex; flex-direction:column; gap:8px;">
+          <canvas id="colorSpectrum" width="220" height="200" style="cursor:crosshair; border:1px solid var(--border-color);"></canvas>
+          <input type="range" id="hueSlider" min="0" max="360" value="0" style="width:220px; accent-color:var(--bg-accent);">
+        </div>
+        <!-- Color Info & Inputs -->
+        <div style="display:flex; flex-direction:column; gap:10px; flex:1;">
+          <div style="display:flex; gap:8px; align-items:center;">
+            <div id="colorPreviewBox" style="width:50px; height:50px; border-radius:var(--radius-sm); border:1px solid #000; background:#000;"></div>
+            <div>
+              <div style="font-weight:600;" id="colorPreviewHex">#000000</div>
+            </div>
+          </div>
+          <div class="form-row">
+            <label style="width:20px;">R:</label>
+            <input type="number" class="form-input" id="inputR" min="0" max="255" value="0">
+          </div>
+          <div class="form-row">
+            <label style="width:20px;">G:</label>
+            <input type="number" class="form-input" id="inputG" min="0" max="255" value="0">
+          </div>
+          <div class="form-row">
+            <label style="width:20px;">B:</label>
+            <input type="number" class="form-input" id="inputB" min="0" max="255" value="0">
+          </div>
+          <div class="form-row">
+            <label style="width:30px;">HEX:</label>
+            <input type="text" class="form-input" id="inputHex" value="#000000">
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-secondary modal-close" data-modal="modalColorPicker">Cancelar</button>
+        <button class="btn-primary" id="btnAddCustomColor">Adicionar às Cores</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Hidden File Input for Open Image -->
+  <input type="file" id="fileInput" accept="image/*" style="display:none;">
+
+  <script type="module" src="/src/main.js"></script>
+</body>
+</html>
