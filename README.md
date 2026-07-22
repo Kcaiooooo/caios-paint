@@ -2,6 +2,8 @@
 
 Um editor de imagem rápido, moderno e intuitivo construído em HTML5, CSS3 e JavaScript Vanilla, desenvolvido especialmente para ser utilizado como um **WebApp de alta performance no Zorin OS (Linux)**.
 
+🌐 **Acesse a aplicação online**: [https://kcaiooooo.github.io/caios-paint/](https://kcaiooooo.github.io/caios-paint/)
+
 ---
 
 ## 🌟 Filosofia do Projeto
