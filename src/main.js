@@ -474,7 +474,7 @@ class PaintApp {
     }
     this.canvasMgr.clearOverlay();
     this.canvasMgr.resizeCanvas(1280, 720, false);
-    document.getElementById('documentTitle').textContent = 'Sem título - Paint Master';
+    document.getElementById('documentTitle').textContent = "Sem título - Caio's Paint";
     this.historyMgr.saveState();
   }
 
@@ -489,7 +489,7 @@ class PaintApp {
         this.canvasMgr.resizeCanvas(img.width, img.height, false);
         this.canvasMgr.ctx.drawImage(img, 0, 0);
         this.historyMgr.saveState();
-        document.getElementById('documentTitle').textContent = `${file.name} - Paint Master`;
+        document.getElementById('documentTitle').textContent = `${file.name} - Caio's Paint`;
       };
       img.src = event.target.result;
     };

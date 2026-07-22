@@ -1,8 +1,9 @@
 {
-  "name": "copypaint",
-  "version": "0.0.0",
+  "name": "caios-paint",
+  "version": "1.0.0",
   "private": true,
   "type": "module",
+  "description": "Editor de imagem moderno, rápido e intuitivo projetado para Zorin OS / Linux, com visual estilo Windows 11 Paint sem a complexidade exagerada de editores de camadas.",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
