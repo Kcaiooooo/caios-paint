@@ -238,12 +238,18 @@ class PaintApp {
 
     if (strokeRange) {
       strokeRange.addEventListener('input', (e) => {
-        const val = parseInt(e.target.value);
-        if (!isNaN(val)) this.setStrokeSize(val, true);
+        const sliderVal = parseInt(e.target.value);
+        if (!isNaN(sliderVal)) {
+          const pixelSize = this.sliderToSize(sliderVal);
+          this.setStrokeSize(pixelSize, true);
+        }
       });
       strokeRange.addEventListener('change', (e) => {
-        const val = parseInt(e.target.value);
-        if (!isNaN(val)) this.setStrokeSize(val, true);
+        const sliderVal = parseInt(e.target.value);
+        if (!isNaN(sliderVal)) {
+          const pixelSize = this.sliderToSize(sliderVal);
+          this.setStrokeSize(pixelSize, true);
+        }
       });
     }
 
@@ -375,6 +381,17 @@ class PaintApp {
     }
   }
 
+  sliderToSize(val) {
+    const t = Math.max(0, Math.min(100, val)) / 100;
+    return Math.max(1, Math.min(500, Math.round(1 + 499 * Math.pow(t, 2.5))));
+  }
+
+  sizeToSlider(size) {
+    const clamped = Math.max(1, Math.min(500, size));
+    const t = Math.pow((clamped - 1) / 499, 1 / 2.5);
+    return Math.round(t * 100);
+  }
+
   setStrokeSize(size, skipRangeSync = false) {
     size = Math.max(1, Math.min(500, parseInt(size) || 1));
     this.currentSize = size;
@@ -385,7 +402,7 @@ class PaintApp {
     const strokeDot = document.getElementById('strokeDot');
 
     if (strokeRange && !skipRangeSync) {
-      strokeRange.value = Math.min(200, size);
+      strokeRange.value = this.sizeToSlider(size);
     }
     if (strokeNum) strokeNum.value = size;
     if (strokeVal) strokeVal.textContent = `${size}px`;
